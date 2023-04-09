@@ -1,6 +1,7 @@
 package yamlfmt
 
 import (
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -22,6 +23,7 @@ type FilepathCollector struct {
 }
 
 func (c *FilepathCollector) CollectPaths() ([]string, error) {
+	fmt.Printf("[DEBUG ISSUE 97] entered filepath collector\n")
 	pathsFound := []string{}
 	for _, inclPath := range c.Include {
 		info, err := os.Stat(inclPath)
@@ -99,18 +101,22 @@ type DoublestarCollector struct {
 }
 
 func (c *DoublestarCollector) CollectPaths() ([]string, error) {
+	fmt.Printf("[DEBUG ISSUE 97] entered doublestar collector\n")
 	includedPaths := []string{}
 	for _, pattern := range c.Include {
 		globMatches, err := doublestar.FilepathGlob(pattern)
 		if err != nil {
+			fmt.Printf("[DEBUG ISSUE 97] filepath glob returned err=%#v\n", includedPaths)
 			return nil, err
 		}
 		includedPaths = append(includedPaths, globMatches...)
 	}
+	fmt.Printf("[DEBUG ISSUE 97] includedPaths=%#v\n", includedPaths)
 
 	pathsToFormatSet := collections.Set[string]{}
 	for _, path := range includedPaths {
 		if len(c.Exclude) == 0 {
+			fmt.Printf("[DEBUG ISSUE 97] included because empty exclude path=%#v\n", path)
 			pathsToFormatSet.Add(path)
 			continue
 		}
@@ -124,13 +130,17 @@ func (c *DoublestarCollector) CollectPaths() ([]string, error) {
 			}
 			match, err := doublestar.PathMatch(filepath.Clean(pattern), absPath)
 			if err != nil {
+				fmt.Printf("[DEBUG ISSUE 97] path match returned err=%#v\n", err)
 				return nil, err
 			}
 			if match {
+				fmt.Printf("[DEBUG ISSUE 97] excluded because of pattern=%#v absPath=%#v\n", pattern, absPath)
 				excluded = true
 			}
+			fmt.Printf("[DEBUG ISSUE 97] no match pattern=%#v absPath=%#v\n", pattern, absPath)
 		}
 		if !excluded {
+			fmt.Printf("[DEBUG ISSUE 97] included because not excluded path=%#v\n", path)
 			pathsToFormatSet.Add(path)
 		}
 	}

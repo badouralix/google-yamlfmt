@@ -113,13 +113,16 @@ func (c *Command) Run() error {
 
 	collectedPaths, err := c.collectPaths()
 	if err != nil {
+		fmt.Printf("[DEBUG ISSUE 97] collect paths returned err=%#v\n", err)
 		return err
 	}
+	fmt.Printf("[DEBUG ISSUE 97] collect paths returned collectedPaths=%#v\n", collectedPaths)
 	paths, err := c.analyzePaths(collectedPaths)
 	if err != nil {
 		log.Printf("path analysis found the following errors:\n%v", err)
 		log.Println("Continuing...")
 	}
+	fmt.Printf("[DEBUG ISSUE 97] analyze paths returned paths=%#v\n", paths)
 
 	switch c.Operation {
 	case OperationFormat:
@@ -164,7 +167,12 @@ func (c *Command) Run() error {
 }
 
 func (c *Command) collectPaths() ([]string, error) {
+	fmt.Printf("[DEBUG ISSUE 97] c.Config=%#v\n", c.Config)
+	fmt.Printf("[DEBUG ISSUE 97] c.Config.FormatterConfig=%#v\n", c.Config.FormatterConfig)
+
 	collector := c.makePathCollector()
+	fmt.Printf("[DEBUG ISSUE 97] collector=%#v\n", collector)
+
 	return collector.CollectPaths()
 }
 
